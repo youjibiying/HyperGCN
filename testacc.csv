@@ -1,0 +1,5 @@
+nohup: ignoring input
+  File "test_acc.sh", line 11
+    layers=(2 4 8 16 32 64 128)
+              ^
+SyntaxError: invalid syntax
