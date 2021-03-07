@@ -48,13 +48,14 @@ if __name__ == '__main__':
 
 
         # train and test HyperGCN
-        HyperGCN = model.train(HyperGCN, dataset, train, args)
-        acc=model.test(HyperGCN, dataset, test, args)
-        results.append(acc)
-        print(acc)
+        HyperGCN,acc = model.train(HyperGCN, dataset, train, args,test)
+        # acc=model.test(HyperGCN, dataset, test, args)
+
+        results.append(acc.cpu().item())
+        print('beat_acc:',acc.cpu().item())
 
     results = np.array(results)
-    print(f"dataset={args.data}_{dataset}\n"
+    print(f"dataset={args.data}", #_{dataset}\n"
           f"avg_test_acc={results.mean()} \n"
           f"std={results.std()}")
 

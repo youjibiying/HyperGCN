@@ -7,8 +7,7 @@ from tqdm import tqdm
 from model import utils
 
 
-
-def train(HyperGCN, dataset, T, args):
+def train(HyperGCN, dataset, T, args, t):
     """
     train for a certain number of epochs
 
@@ -20,25 +19,37 @@ def train(HyperGCN, dataset, T, args):
 
 	returns:
 	the trained model
-    """    
-    
+    """
+
     hypergcn, optimiser = HyperGCN['model'], HyperGCN['optimiser']
     hypergcn.train()
-    
+
     X, Y = dataset['features'], dataset['labels']
+    best_acc = 0.0
+    best_epoch = 0.0
+    early = 0
 
-    for epoch in tqdm(range(args.epochs)):
-
+    for epoch in tqdm(range(args.epochs), disable=True):
+        hypergcn.train()
         optimiser.zero_grad()
         Z = hypergcn(X)
         loss = F.nll_loss(Z[T], Y[T])
 
         loss.backward()
         optimiser.step()
-
+        with torch.set_grad_enabled(False):
+            acc = test(hypergcn, dataset, t, args)
+            # print(f"Epoch:{epoch}\tacc:{acc}\tbest_acc:{best_acc} at {best_epoch}")
+        if acc > best_acc:
+            best_epoch = epoch
+            best_acc = acc
+            early = 0
+        early += 1
+        if early > args.early_stopping:
+            break
+    print(f"Epoch:{epoch}\tacc:{acc}\tbest_acc:{best_acc} at {best_epoch}")
     HyperGCN['model'] = hypergcn
-    return HyperGCN
-
+    return HyperGCN, best_acc
 
 
 def test(HyperGCN, dataset, t, args):
@@ -54,15 +65,15 @@ def test(HyperGCN, dataset, t, args):
 	returns:
 	accuracy of predictions    
     """
-    
-    hypergcn = HyperGCN['model']
+    try:
+        hypergcn = HyperGCN['model']
+    except:
+        hypergcn = HyperGCN
     hypergcn.eval()
     X, Y = dataset['features'], dataset['labels']
-    
 
-    Z = hypergcn(X) 
+    Z = hypergcn(X)
     return accuracy(Z[t], Y[t])
-    
 
 
 def accuracy(Z, Y):
@@ -74,14 +85,13 @@ def accuracy(Z, Y):
     returns: 
     accuracy
     """
-    
+
     predictions = Z.max(1)[1].type_as(Y)
     correct = predictions.eq(Y).double()
     correct = correct.sum()
 
     accuracy = correct / len(Y)
     return accuracy
-
 
 
 def initialise(dataset, args):
@@ -95,7 +105,7 @@ def initialise(dataset, args):
     returns:
     a dictionary with model details (hypergcn, optimiser)    
     """
-    
+
     HyperGCN = {}
     V, E = dataset['n'], dataset['hypergraph']
     X, Y = dataset['features'], dataset['labels']
@@ -105,11 +115,10 @@ def initialise(dataset, args):
     hypergcn = networks.HyperGCN(V, E, X, args)
     optimiser = optim.Adam(list(hypergcn.parameters()), lr=args.rate, weight_decay=args.decay)
 
-
     # node features in sparse representation
     X = sp.csr_matrix(normalise(np.array(X)), dtype=np.float32)
     X = torch.FloatTensor(np.array(X.todense()))
-    
+
     # labels
     Y = np.array(Y)
     Y = torch.LongTensor(np.where(Y)[1])
@@ -130,7 +139,6 @@ def initialise(dataset, args):
     return HyperGCN
 
 
-
 def normalise(M):
     """
     row-normalise sparse matrix
@@ -142,11 +150,11 @@ def normalise(M):
     D^{-1} M  
     where D is the diagonal node-degree matrix 
     """
-    
+
     d = np.array(M.sum(1))
-    
+
     di = np.power(d, -1).flatten()
     di[np.isinf(di)] = 0.
-    DI = sp.diags(di)    # D inverse i.e. D^{-1}
-    
+    DI = sp.diags(di)  # D inverse i.e. D^{-1}
+
     return DI.dot(M)

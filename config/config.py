@@ -76,6 +76,10 @@ def parse():
 	p.add('--gpu', type=int, default=gpu, help='gpu number to use')
 	p.add('--cuda', type=bool, default=cuda, help='cuda for gpu')
 	p.add('--seed', type=int, default=seed, help='seed for randomness')
+
+	p.add("--early_stopping", type=int,
+						default=100,
+						help="The patience of earlystopping. Do not adopt the earlystopping when it equals 0.")
 	p.add('-f') # for jupyter default
 	return p.parse_args()
 

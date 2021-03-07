@@ -2,3 +2,5 @@
 *.pyc
 models/__pycache__/__init__.cpython-37.pyc
 results/tensorboard/
+README.md
+README.md
