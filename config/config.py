@@ -2,8 +2,9 @@
 data: coauthorship/cocitation
 dataset: cora/dblp/acm for coauthorship and cora/citeseer/pubmed for cocitation
 '''
-data = "coauthorship"
-dataset = "dblp"
+# data = "coauthorship"
+data = "cocitation"
+dataset = "cora"
 
 
 
@@ -23,7 +24,7 @@ gpu: gpu number to use
 cuda: True or False
 seed: an integer
 '''
-gpu = 3
+gpu = 2
 cuda = True
 seed = 5
 
@@ -37,7 +38,7 @@ epochs: number of training epochs
 '''
 depth = 2
 dropout = 0.5
-epochs = 200
+epochs = 1000
 
 
 
@@ -70,7 +71,7 @@ def parse():
 	p.add('--split', type=int, default=split, help='train-test split used for the dataset')
 	p.add('--depth', type=int, default=depth, help='number of hidden layers')
 	p.add('--dropout', type=float, default=dropout, help='dropout probability for GCN hidden layer')
-	p.add('--rate', type=float, default=rate, help='learning rate')
+	p.add('--lr', type=float, default=rate, help='learning rate')
 	p.add('--decay', type=float, default=decay, help='weight decay')
 	p.add('--epochs', type=int, default=epochs, help='number of epochs to train')
 	p.add('--gpu', type=int, default=gpu, help='gpu number to use')

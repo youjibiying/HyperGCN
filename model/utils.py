@@ -42,8 +42,8 @@ class HyperGraphConvolution(Module):
 
         if self.cuda: A = A.cuda()
         A = Variable(A)
-
-        AHW = SparseMM.apply(A, HW)     
+        AHW = torch.spmm(A,HW)
+        # AHW = SparseMM.apply(A, HW)
         return AHW + b
 
 
@@ -105,7 +105,7 @@ def Laplacian(V, E, X, m):
         
         p = np.dot(X[hyperedge], rv)   #projection onto a random vector rv
         s, i = np.argmax(p), np.argmin(p)
-        Se, Ie = hyperedge[s], hyperedge[i]
+        Se, Ie = hyperedge[s], hyperedge[i] # 取出最大和最小
 
         # two stars with mediators
         c = 2*len(hyperedge) - 3    # normalisation constant

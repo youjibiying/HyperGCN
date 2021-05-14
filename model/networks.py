@@ -22,9 +22,10 @@ class HyperGCN(nn.Module):
             power = l - i + 2
             if args.dataset == 'citeseer':
                 power = l - i + 4
-            h.append(min(2 ** power,128))  #
+            # h.append(min(2 ** power,128))  #
+            h.append(128)  #
         h.append(c)
-
+        # h=[d,128,128]
         if args.fast:
             reapproximate = False
             structure = utils.Laplacian(V, E, X, args.mediators)
@@ -32,6 +33,8 @@ class HyperGCN(nn.Module):
             reapproximate = True
             structure = E
 
+        # self.layers = nn.ModuleList(
+        #     [utils.HyperGraphConvolution(h[i], h[i + 1], reapproximate, cuda) for i in range(l)])
         self.layers = nn.ModuleList(
             [utils.HyperGraphConvolution(h[i], h[i + 1], reapproximate, cuda) for i in range(l)])
         self.do, self.l = args.dropout, args.depth

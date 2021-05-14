@@ -45,6 +45,9 @@ def train(HyperGCN, dataset, T, args, t):
             best_acc = acc
             early = 0
         early += 1
+        if epoch % 20 ==0:
+            print(f"{epoch}/{args.epochs},loss: {loss:.4f}, test_acc: {acc:4f} best_test_acc:{best_acc:4f}"
+                  f" depth:{args.depth} {args.data}/{args.dataset}")
         if early > args.early_stopping:
             break
     print(f"Epoch:{epoch}\tacc:{acc}\tbest_acc:{best_acc} at {best_epoch}")
@@ -113,7 +116,7 @@ def initialise(dataset, args):
     # hypergcn and optimiser
     args.d, args.c = X.shape[1], Y.shape[1]
     hypergcn = networks.HyperGCN(V, E, X, args)
-    optimiser = optim.Adam(list(hypergcn.parameters()), lr=args.rate, weight_decay=args.decay)
+    optimiser = optim.Adam(list(hypergcn.parameters()), lr=args.lr, weight_decay=args.decay)
 
     # node features in sparse representation
     X = sp.csr_matrix(normalise(np.array(X)), dtype=np.float32)
