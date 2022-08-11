@@ -34,6 +34,8 @@ np.random.seed(args.seed)
 # load data
 
 if __name__ == '__main__':
+    elapsed_times=[]
+
     print(args)
     splits =[1+i for i in range(10)]
     results = []
@@ -56,6 +58,8 @@ if __name__ == '__main__':
         # acc=model.test(HyperGCN, dataset, test, args)
 
         results.append(acc.cpu().item())
+        elapsed_times.append(time_elapsed)
+
         print('beat_acc:',acc.cpu().item())
         print(results)
 

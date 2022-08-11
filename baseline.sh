@@ -7,7 +7,7 @@
 #python hypergcn.py --mediators True --split 1 --depth 64 --data cocitation --dataset cora --gpu 0 &
 #python hypergcn.py --mediators True --split 1 --depth 64 --data cocitation --dataset pubmed --gpu 1 &
 #python hypergcn.py --mediators True --split 1 --depth 64 --data coauthorship --dataset cora --gpu 3 &
-python hypergcn.py --mediators True --split 1 --gpu 2 --depth 64 --data coauthorship --dataset dblp > depth_64.log 2>&1 &
+#python hypergcn.py --mediators True --split 1 --gpu 2 --depth 64 --data coauthorship --dataset dblp > depth_64.log 2>&1 &
 
 
 
